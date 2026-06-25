@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuizSphere — Free Online Quizzes</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">Quiz<span>Sphere</span></div>
+      <div class="viewers-badge">
+        <span class="pulse-dot"></span>
+        <span id="viewerCount">301</span> watching now
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-content">
+      <p class="hero-eyebrow">Free · No Login · Instant</p>
+      <h1 class="hero-title">Test Your Knowledge<br /><span>Every Answer Counts</span></h1>
+      <p class="hero-sub">Randomised MCQ &amp; True/False quizzes. New order every time you start.</p>
+      <div class="hero-cta-group">
+        <button class="btn btn-primary" onclick="showQuizConfig()">Generate Quiz</button>
+        <a href="#how-it-works" class="btn btn-ghost">How it works</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">100</span><span class="stat-label">MCQ Bank</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">100</span><span class="stat-label">True/False Bank</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">∞</span><span class="stat-label">Combos</span></div>
+      </div>
+    </div>
+    <div class="hero-graphic" aria-hidden="true">
+      <div class="orbit-ring ring1"></div>
+      <div class="orbit-ring ring2"></div>
+      <div class="orbit-ring ring3"></div>
+      <div class="core-icon">?</div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="section-inner">
+      <h2 class="section-title">How It Works</h2>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-icon">⚙️</div>
+          <h3>Configure</h3>
+          <p>Choose how many MCQs (up to 20) and True/False questions (up to 10) you want.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon">🎲</div>
+          <h3>Randomise</h3>
+          <p>Our engine picks random questions from a 200-question bank and shuffles answer options.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-icon">✅</div>
+          <h3>Submit &amp; Score</h3>
+          <p>Submit your answers and get instant results with explanations for every question.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUIZ CONFIG MODAL -->
+  <div class="modal-overlay" id="quizConfigModal" role="dialog" aria-modal="true" aria-labelledby="configTitle">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeModal('quizConfigModal')" aria-label="Close">&times;</button>
+      <h2 id="configTitle">Configure Your Quiz</h2>
+      <p class="modal-sub">Select how many questions you want. Questions are randomly pulled from our bank.</p>
+      <div class="config-row">
+        <label for="mcqCount">MCQ Questions <span class="config-max">(max 20)</span></label>
+        <div class="slider-wrap">
+          <input type="range" id="mcqCount" min="1" max="20" value="10" oninput="updateSliderLabel('mcqCount','mcqLabel')" />
+          <span class="slider-label" id="mcqLabel">10</span>
+        </div>
+      </div>
+      <div class="config-row">
+        <label for="tfCount">True/False Questions <span class="config-max">(max 10)</span></label>
+        <div class="slider-wrap">
+          <input type="range" id="tfCount" min="1" max="10" value="5" oninput="updateSliderLabel('tfCount','tfLabel')" />
+          <span class="slider-label" id="tfLabel">5</span>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="startQuiz()">Start Quiz 🚀</button>
+    </div>
+  </div>
+
+  <!-- QUIZ SECTION -->
+  <section class="quiz-section" id="quizSection" style="display:none;">
+    <div class="quiz-inner">
+      <div class="quiz-topbar">
+        <div class="quiz-progress-wrap">
+          <div class="quiz-progress-bar" id="quizProgressBar"></div>
+        </div>
+        <div class="quiz-meta">
+          <span id="questionCounter">Question 1 / 15</span>
+          <button class="btn btn-ghost btn-sm" onclick="exitQuiz()">Exit</button>
+        </div>
+      </div>
+
+      <div id="questionArea"></div>
+
+      <div class="quiz-nav">
+        <button class="btn btn-ghost" id="prevBtn" onclick="navigateQuestion(-1)" style="visibility:hidden;">← Prev</button>
+        <button class="btn btn-primary" id="nextBtn" onclick="navigateQuestion(1)">Next →</button>
+        <button class="btn btn-success" id="submitBtn" onclick="submitQuiz()" style="display:none;">Submit Quiz ✓</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTS SECTION -->
+  <section class="results-section" id="resultsSection" style="display:none;">
+    <div class="results-inner">
+      <div class="results-header">
+        <div class="score-ring-wrap">
+          <svg class="score-ring" viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="50" />
+            <circle class="ring-fill" id="scoreRingFill" cx="60" cy="60" r="50" />
+          </svg>
+          <div class="score-center">
+            <span id="scorePercent">0%</span>
+            <small id="scoreLabel">Score</small>
+          </div>
+        </div>
+        <h2 id="resultTitle">Quiz Complete!</h2>
+        <p id="resultSub"></p>
+      </div>
+      <div class="result-stats-row">
+        <div class="result-stat correct"><span id="correctCount">0</span><small>Correct</small></div>
+        <div class="result-stat wrong"><span id="wrongCount">0</span><small>Wrong</small></div>
+        <div class="result-stat skipped"><span id="skippedCount">0</span><small>Skipped</small></div>
+      </div>
+      <div id="reviewArea"></div>
+      <div class="results-actions">
+        <button class="btn btn-primary" onclick="showQuizConfig()">Try Again</button>
+        <button class="btn btn-ghost" onclick="scrollToReviews()">Leave a Review</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEW FORM -->
+  <section class="review-section" id="reviewSection">
+    <div class="section-inner">
+      <h2 class="section-title">What Do You Think?</h2>
+      <p class="section-sub">Help us improve — your feedback matters.</p>
+
+      <div class="review-form-wrap">
+        <div class="form-group">
+          <label for="reviewName">Your Name</label>
+          <input type="text" id="reviewName" placeholder="e.g. Sara K." maxlength="40" />
+        </div>
+        <div class="form-group">
+          <label>Rating</label>
+          <div class="star-rating" id="starRating">
+            <span class="star" data-val="1">★</span>
+            <span class="star" data-val="2">★</span>
+            <span class="star" data-val="3">★</span>
+            <span class="star" data-val="4">★</span>
+            <span class="star" data-val="5">★</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reviewText">Your Review</label>
+          <textarea id="reviewText" rows="4" placeholder="Share your experience with QuizSphere..." maxlength="300"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="submitReview()">Submit Review</button>
+      </div>
+
+      <div class="reviews-list" id="reviewsList"></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="logo">Quiz<span>Sphere</span></div>
+      <p>Free quizzes, no login required. Built for curious minds.</p>
+      <p class="footer-copy">&copy; 2025 QuizSphere. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="questions.js"></script>
+  <script src="quiz.js"></script>
+  <script src="viewers.js"></script>
+  <script src="reviews.js"></script>
+</body>
+</html>
